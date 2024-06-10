@@ -33,3 +33,27 @@ remove_na_on_x_y <- function(data){
   return(data)
 }
 
+
+
+
+
+
+remove_outliers_age_estime = function(data){ # enleve les valeurs aberrantes de age_estim
+  # src : https://www.r-bloggers.com/2021/09/how-to-remove-outliers-in-r-4/
+  #Q1 <- quantile(data$age_estim, 0.001, na.rm = TRUE) # place des quantiles
+  Q3 <- quantile(data$age_estim, 0.9999, na.rm = TRUE)
+  IQR <- IQR(data$age_estim, na.rm = TRUE)
+  
+  data$age_estim[data$age_estim > (Q3 + 1.5*IQR)] = mean(data$age_estim < (Q3 + 1.5*IQR), na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
+  return(data)
+}
+
+
+remove_outliers_age_estime_2 = function(data){ # enleve les valeurs aberrantes de age_estim, avec palier fixe
+  data$age_estim[data$age_estim > 1000] = mean(data$age_estim < 500, na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
+  return(data)
+}
+
+
+
+

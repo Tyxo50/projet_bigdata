@@ -11,12 +11,9 @@ to_utf8 <- function(data) {
 convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date', 'character', 'character', 'character', 'character', 'integer', 'numeric', 'numeric', 'integer', 'character', 'character', 'character', 'character', 'character', 'bool', 'character', 'date', 'integer', 'integer', 'integer', 'date', 'character', 'character', 'date', 'character', 'character', 'character', 'character', 'date', 'character', 'date', 'character', 'character', 'bool')) {
   i = 1
   for(col in colnames(data)){
-<<<<<<< HEAD
     # print(i)
     # print(col)
-=======
-    
->>>>>>> 23b5f939c4801185e3791bddc070d7811faba853
+
     if(types[i] == 'numeric'){
       data[[col]] = as.numeric(data[[col]])
     }else if (types[i] == 'integer'){
@@ -46,14 +43,12 @@ add_year_only_column = function(data){
 data = to_utf8(data)
 data2 = convert_data(data)
 
-<<<<<<< HEAD
 data_plus_years = add_year_only_column(data2)
 
 # print(summary(data))
 # 
-=======
 
->>>>>>> 23b5f939c4801185e3791bddc070d7811faba853
+
 sapply(data2, class)
 
 View(data2)
@@ -73,7 +68,7 @@ remove_outliers_age_estime = function(data){
 
 
 remove_outliers_age_estime_2 = function(data){
-  data$age_estim[data3$age_estim > 1000] = mean(data3$age_estim < 500, na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
+  data$age_estim[data$age_estim > 1000] = mean(data$age_estim < 500, na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
   return(data)
   }
 
