@@ -41,9 +41,7 @@ head(data_replace)
 # suppression des doublons 
 
 # duplicated renvoie les doublons et data_unique est egale a data sans les doublons trouvés par duplicated 
-data_unique <- data[!duplicated(data), ]
 
-print(data_unique
 
 # gestion des valeurs aberrantes 
 
