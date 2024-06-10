@@ -21,6 +21,8 @@ convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date'
       data[[col]] = as.character(data[[col]])
     }else if (types[i] == 'bool'){
       data[[col]] = as.logical(data[[col]])
+    }else if (types[i] == 'date'){
+      data[[col]] = as.Date(data[[col]], format="%Y/%m/%d")
     }else{
       print("Type non connu?!")
     }
@@ -39,6 +41,7 @@ sapply(data2, class)
 
 
 
+View(data)
 
-
+View(data2)
 
