@@ -53,7 +53,56 @@ View(data)
 
 View(data2)
 
-data3 = data2
-data3$haut_tot[is.zero(data3$haut_tot)] = mean(data3$haut_tot, na.rm = TRUE)
 
-model = lm(formula = )
+
+
+remove_outliers_age_estime = function(data){
+  # src : https://www.r-bloggers.com/2021/09/how-to-remove-outliers-in-r-4/
+  #Q1 <- quantile(data$age_estim, 0.001, na.rm = TRUE) # place des quantiles
+  Q3 <- quantile(data$age_estim, 0.9999, na.rm = TRUE)
+  IQR <- IQR(data$age_estim, na.rm = TRUE)
+  
+  data$age_estim[data3$age_estim > (Q3 + 1.5*IQR)] = mean(data3$age_estim < (Q3 + 1.5*IQR), na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
+  return(data)
+}
+
+
+remove_outliers_age_estime_2 = function(data){
+  data$age_estim[data3$age_estim > 1000] = mean(data3$age_estim < 500, na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
+  return(data)
+  }
+
+data3 = data2
+d = remove_outliers_age_estime_2(data3)
+View(d)
+head(data3)
+
+boxplot(d$age_estim)
+
+
+
+
+
+boxplot(data3$age_estim)
+head(data3$age_estim)
+View(data3)
+
+
+
+
+# data3$haut_tot[isZero(data3$haut_tot)] = mean(data3$haut_tot, na.rm = TRUE)
+data3$haut_tot[data3$haut_tot==0] = mean(data3$haut_tot[data3$haut_tot != 0], na.rm = TRUE) # remplace les hauteurs de 0 par la moyenne
+
+model = lm(formula = data3$haut_tot ~ data3$age_estim)
+summary(model)
+
+plot(haut_tot ~ age_estim, data=data3)
+abline(model)
+
+
+
+
+no_outliers = subset(data, data2$age_estim > (Q1 - 1.5*IQR) & data2$age_estim < (Q3 + 1.5*IQR))
+dim(no_outliers)
+boxplot(no_outliers)
+
