@@ -10,5 +10,3 @@ data = convert_data(data)
 data = remove_na_on_x_y(data)
 print(dim(data))
 View(data)
-
-print(sum(is.na(data$created_date)))

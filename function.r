@@ -1,6 +1,3 @@
-data = read.csv(file="Patrimoine_Arbore.csv", sep = ",")
-
-
 to_utf8 <- function(data) {
     for (identifier in colnames(data)) {
         data[[identifier]] = iconv(data[[identifier]], from = "latin1", to = "UTF-8")
@@ -30,13 +27,9 @@ convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date'
     return(data)
 }
 
-
-
-data = to_utf8(data)
-data2 = convert_data(data)
-
-
-sapply(data2, class)
-
-View(data2)
+remove_na_on_x_y <- function(data){
+  data = data[!is.na(data$X), ]
+  data = data[!is.na(data$Y), ]
+  return(data)
+}
 
