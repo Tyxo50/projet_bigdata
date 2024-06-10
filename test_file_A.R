@@ -11,8 +11,8 @@ to_utf8 <- function(data) {
 convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date', 'character', 'character', 'character', 'character', 'integer', 'numeric', 'numeric', 'integer', 'character', 'character', 'character', 'character', 'character', 'bool', 'character', 'date', 'integer', 'integer', 'integer', 'date', 'character', 'character', 'date', 'character', 'character', 'character', 'character', 'date', 'character', 'date', 'character', 'character', 'bool')) {
   i = 1
   for(col in colnames(data)){
-    print(i)
-    print(col)
+    # print(i)
+    # print(col)
     if(types[i] == 'numeric'){
       data[[col]] = as.numeric(data[[col]])
     }else if (types[i] == 'integer'){
