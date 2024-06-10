@@ -31,9 +31,17 @@ convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date'
     return(data)
 }
 
+add_year_only_column = function(data){
+  years = as.Date(data$created_date, format="%Y")
+  data[["year"]] = years
+  return(data)
+}
+
 
 data = to_utf8(data)
 data2 = convert_data(data)
+
+data_plus_years = add_year_only_column(data2)
 
 # print(summary(data))
 # 
@@ -45,3 +53,7 @@ View(data)
 
 View(data2)
 
+data3 = data2
+data3$haut_tot[is.zero(data3$haut_tot)] = mean(data3$haut_tot, na.rm = TRUE)
+
+model = lm(formula = )
