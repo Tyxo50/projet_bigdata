@@ -1,6 +1,7 @@
 to_utf8 <- function(data) {
     for (identifier in colnames(data)) {
         data[[identifier]] = iconv(data[[identifier]], from = "latin1", to = "UTF-8")
+        
     }
     return(data)
 }
