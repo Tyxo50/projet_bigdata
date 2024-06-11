@@ -14,7 +14,7 @@ data = data[rowSums(is.na(data)) < 13, ]
 data <- remove_na_feuillage(data, "feuillage")
 print(dim(data))
 data = remove_empty_line13(data)
-#data = all_str_to_lower(data)
+data = all_str_to_lower(data)
 data = to_factor(data)
 print(dim(data))
 data = remove_na_on_x_y(data)
