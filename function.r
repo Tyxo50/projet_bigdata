@@ -88,15 +88,24 @@ remove_doublon <- function(data){
 }
 
 
+remplace_na_par_mediane <- function(x) {
+  median_value <- median(x, na.rm = TRUE)
+  x[is.na(x)] <- median_value
+  return(x)
+}
 
 
 
+remove_ras <- function(data, colonne) {
+  data <- data[data[[colonne]] != "RAS", ]
+  return(data)
+}
 
 
-
-
-
-
+remove_na_feuillage <- function(data, colonne) {
+  data <- data[!is.na(data[[colonne]]), ]
+  return(data)
+}
 
 
 
