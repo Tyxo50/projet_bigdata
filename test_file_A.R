@@ -173,7 +173,7 @@ barplot(prop.table(table(data$fk_stadedev)), las=2)
 
 
 # arbres par type de feuillage
-barplot(prop.table(table(data$feuillage)), las=2)
+barplot(prop.table(table(data$feuillage)), las=1)
 
 
 # animals <- c("cat", "dog",  "dog", "dog", "dog", "dog", "dog", "dog", "cat", "cat", "bird")
@@ -181,8 +181,34 @@ barplot(prop.table(table(data$feuillage)), las=2)
 # #hist(table(animalFactor), freq=TRUE, xlab = levels(animalFactor), ylab = "Frequencies")
 # barplot(prop.table(table(animals)))
 
+n = 10
+x = sample(data$X, n)
+y = sample(data$Y, n)
+data$Y[data$clc_quartier == "harly"][!is.na(data$Y[data$clc_quartier == "harly"])]
 
 
+# pour un quartier en particulier
+coo <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "harly")])), x= data$X[which(data$clc_quartier == "harly")], 
+                   y=data$Y[which(data$clc_quartier == "harly")]) %>%
+  st_as_sf(coords=c("x", "y"), crs=3949) %>%
+  st_transform(4326) 
+# ------
+
+c = st_transform(st_as_sf(data, coords =c("X", "Y"), crs=3949), crs=4326)
+
+c %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircles()
+View(coo)
+
+ # ------------
+# head(c)
+# head(data)
+# print(dim(c))
+# print(dim(data))
 
 
+# l = data[which(data$clc_quartier == "harly",)]
+# View(l)
 
