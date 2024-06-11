@@ -186,20 +186,39 @@ x = sample(data$X, n)
 y = sample(data$Y, n)
 data$Y[data$clc_quartier == "harly"][!is.na(data$Y[data$clc_quartier == "harly"])]
 
+# pour tous les points
+c = st_transform(st_as_sf(data, coords =c("X", "Y"), crs=3949), crs=4326)
 
 # pour un quartier en particulier
 coo <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "harly")])), x= data$X[which(data$clc_quartier == "harly")], 
                    y=data$Y[which(data$clc_quartier == "harly")]) %>%
   st_as_sf(coords=c("x", "y"), crs=3949) %>%
   st_transform(4326) 
+
+
+  map = leaflet(coo) %>%
+  addTiles() %>%
+  addCircles(color="red")
+
+
+
 # ------
 
-c = st_transform(st_as_sf(data, coords =c("X", "Y"), crs=3949), crs=4326)
+new_points <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "quartier de neuville")])), x= data$X[which(data$clc_quartier == "quartier de neuville")], 
+                  y=data$Y[which(data$clc_quartier == "quartier de neuville")]) %>%
+  st_as_sf(coords=c("x", "y"), crs=3949) %>%
+  st_transform(4326) 
 
-c %>%
-  leaflet() %>%
-  addTiles() %>%
-  addCircles()
+
+map %>%
+  addCircles(data = new_points, color="green")
+
+
+
+
+
+
+
 View(coo)
 
  # ------------
