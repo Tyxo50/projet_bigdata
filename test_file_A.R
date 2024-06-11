@@ -2,10 +2,10 @@ data = read.csv(file="Patrimoine_Arbore.csv", sep = ",")
 
 
 to_utf8 <- function(data) {
-    for (identifier in colnames(data)) {
-        data[[identifier]] = iconv(data[[identifier]], from = "latin1", to = "UTF-8")
-    }
-    return(data)
+  for (identifier in colnames(data)) {
+    data[[identifier]] = iconv(data[[identifier]], from = "latin1", to = "UTF-8")
+  }
+  return(data)
 }
 
 convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date', 'character', 'character', 'character', 'character', 'integer', 'numeric', 'numeric', 'integer', 'character', 'character', 'character', 'character', 'character', 'bool', 'character', 'date', 'integer', 'integer', 'integer', 'date', 'character', 'character', 'date', 'character', 'character', 'character', 'character', 'date', 'character', 'date', 'character', 'character', 'bool')) {
@@ -13,7 +13,7 @@ convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date'
   for(col in colnames(data)){
     # print(i)
     # print(col)
-
+    
     if(types[i] == 'numeric'){
       data[[col]] = as.numeric(data[[col]])
     }else if (types[i] == 'integer'){
@@ -29,7 +29,7 @@ convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date'
     }
     i=i+1
   }
-    return(data)
+  return(data)
 }
 
 add_year_only_column = function(data){
@@ -70,7 +70,7 @@ remove_outliers_age_estime = function(data){
 remove_outliers_age_estime_2 = function(data){
   data$age_estim[data$age_estim > 1000] = mean(data$age_estim < 500, na.rm = TRUE) # remplace les valeurs en dehors des bornes par la moyenne (moyenne sans les valeurs extremes)
   return(data)
-  }
+}
 
 data3 = data2
 d = remove_outliers_age_estime_2(data3)
@@ -105,4 +105,84 @@ abline(model)
 no_outliers = subset(data, data2$age_estim > (Q1 - 1.5*IQR) & data2$age_estim < (Q3 + 1.5*IQR))
 dim(no_outliers)
 boxplot(no_outliers)
+
+plot(data$X, data$Y)
+vv=c(11228:11232)
+points(data$X[vv], data$Y[vv], col="red")
+points(data$X[data$clc_quartier==""], data$Y[data$clc_quartier==""], col="violet")
+
+
+
+
+norme_euclidienne = function(x1, y1, x2, y2){
+  return(sqrt((x2-x1)^2+(y2-y1)^2))
+}
+
+hist(data$haut_tot)
+
+to_factor = function(data){
+  data$clc_quartier = as.factor(data$clc_quartier)
+  data$fk_arb_etat = as.factor(data$fk_arb_etat)
+  data$fk_stadedev = as.factor(data$fk_stadedev)
+  data$fk_port = as.factor(data$fk_port)
+  data$fk_pied = as.factor(data$fk_pied)
+  data$fk_situation = as.factor(data$fk_situation)
+  data$fk_revetement = as.factor(data$fk_revetement)
+  data$feuillage = as.factor(data$feuillage)
+  data$nomfrancais = as.factor(data$nomfrancais)
+  
+  return(data)
+}
+
+
+all_str_to_lower = function(data){
+  for(col in colnames(data)){
+    print(unique(sapply(data[[col]], class)))
+    if(unique(sapply(data[[col]], class)) == "character"){
+      data[[col]] = tolower(data[[col]])
+    }
+  }
+  return(data)
+}
+
+data = all_str_to_lower(data)
+
+
+
+# ================= PLOTS ==================
+# barplot arbres par quartier
+barplot(prop.table(table(data$feuillage)), las=2)
+
+# boxplot diametre tronc
+boxplot(data$tronc_diam)
+
+# plot arbre apar stade developpement
+plot(data$X, data$Y)
+
+points(data$X[data$fk_stadedev=="adulte"], data$Y[data$fk_stadedev=="adulte"], col="violet")
+#points(data$X[data$fk_stadedev=="Adulte"], data$Y[data$fk_stadedev=="Adulte"], col="violet")
+#points(data$X[data$fk_stadedev=="Jeune"], data$Y[data$fk_stadedev=="Jeune"], col="green")
+points(data$X[data$fk_stadedev=="jeune"], data$Y[data$fk_stadedev=="jeune"], col="green")
+points(data$X[data$fk_stadedev=="senescent"], data$Y[data$fk_stadedev=="senescent"], col="blue")
+points(data$X[data$fk_stadedev=="vieux"], data$Y[data$fk_stadedev=="vieux"], col="brown")
+
+legend("topleft", legend=c("adulte", "jeune", "senescent", "vieux"), pch=16, col=c("violet", "green", "blue", "brown"))
+
+# barplot arbres par stade de developpement
+barplot(prop.table(table(data$fk_stadedev)), las=2)
+
+
+# arbres par type de feuillage
+barplot(prop.table(table(data$feuillage)), las=2)
+
+
+# animals <- c("cat", "dog",  "dog", "dog", "dog", "dog", "dog", "dog", "cat", "cat", "bird")
+# animalFactor <- as.factor(animals)
+# #hist(table(animalFactor), freq=TRUE, xlab = levels(animalFactor), ylab = "Frequencies")
+# barplot(prop.table(table(animals)))
+
+
+
+
+
 
