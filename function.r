@@ -82,8 +82,10 @@ remplace_na_par_mediane <- function(x) {
 
 
 
-
-
+remove_ras <- function(data, colonne) {
+  data <- data[data[[colonne]] != "RAS", ]
+  return(data)
+}
 
 
 

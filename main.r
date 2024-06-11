@@ -10,8 +10,10 @@ data = to_utf8(data)
 data = convert_data(data)
 data = remove_na_on_x_y(data)
 data = remove_outliers_age_estime_2(data)
+data = data[rowSums(is.na(data)) < 13, ]
+data = remove_ras(data, "nomfrançais")
+return(data)
 print(dim(data))
-data = remove_empty_line13(data)
 print(dim(data))
 
 View(data)
