@@ -74,6 +74,12 @@ remove_empty_line13 <- function(data){
 }
 
 
+remplace_na_par_mediane <- function(x) {
+  median_value <- median(x, na.rm = TRUE)
+  x[is.na(x)] <- median_value
+  return(x)
+}
+
 
 
 
