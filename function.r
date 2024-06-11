@@ -83,11 +83,11 @@ remplace_na_par_mediane <- function(x) {
 
 
 remove_ras <- function(data, colonne) {
+  print(unique(data[[colonne]]))
   data <- data[data[[colonne]] != "RAS", ]
+  print(unique(data[[colonne]]))
   return(data)
 }
-
-
 
 
 
