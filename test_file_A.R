@@ -204,7 +204,7 @@ coo <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "harly")])), 
 
 # ------
 
-new_points <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "quartier de neuville")])), x= data$X[which(data$clc_quartier == "quartier de neuville")], 
+new_points <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "quartier de neuville")])), x= data$X[which(data$clc_quartier == "quartier de neuville")],
                   y=data$Y[which(data$clc_quartier == "quartier de neuville")]) %>%
   st_as_sf(coords=c("x", "y"), crs=3949) %>%
   st_transform(4326) 
