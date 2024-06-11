@@ -54,6 +54,8 @@ remove_outliers_age_estime_2 = function(data){ # enleve les valeurs aberrantes d
   return(data)
 }
 
-
+norme_euclidienne = function(x1, y1, x2, y2){
+  return(sqrt((x2-x1)^2+(y2-y1)^2))
+}
 
 
