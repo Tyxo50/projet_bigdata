@@ -208,7 +208,6 @@ predict_tronc_diam <- function(data) {
     
     data$tronc_diam[is.na(data$tronc_diam)] <- predictions
   }
-  
   return(data)
 }
 
@@ -303,7 +302,7 @@ for(i in seq_along(quartiers)) {
   quartier_data <- data %>% filter(clc_quartier == quartier)
 
   quartier_data$tronc_diam <- as.numeric(quartier_data$tronc_diam)
-  print(quartier_data$tronc_diam)
+  #print(quartier_data$tronc_diam)
   # Création de la data frame pour les points du quartier
   # new_points <- data.frame(
   #   id = 1:nrow(quartier_data),
@@ -313,7 +312,13 @@ for(i in seq_along(quartiers)) {
   # )
   # Ajout des cercles à la carte avec une couleur différente
   #View(quartier_data$tronc_diam)
-  map <- map %>% addCircles(data = quartier_data, radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20), lat=quartier_data$X, lng=quartier_data$Y, color = colors[i],  group = quartier, popup = ~paste("Taille : ", quartier_data$haut_tot, "<br>Quartier : ", quartier, "<br>Diam : ", quartier_data$tronc_diam))
+  map <- map %>% addCircles(data = quartier_data,
+                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),
+                            lat=quartier_data$X,
+                            lng=quartier_data$Y,
+                            color = ~ifelse(remarquable == "oui", "black", colors[i]),
+                            group = quartier,
+                            popup = ~paste("Taille : ", quartier_data$haut_tot, "<br>Quartier : ", quartier, "<br>Diam : ", quartier_data$tronc_diam))
 }
 
 # Ajout de la légende à la carte

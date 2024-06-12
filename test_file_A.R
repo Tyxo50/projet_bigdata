@@ -150,8 +150,9 @@ data = all_str_to_lower(data)
 
 
 # ================= PLOTS ==================
-# barplot arbres par quartier
+# barplot nb arbres par quartier
 barplot(prop.table(table(data$feuillage)), las=2)
+
 
 # boxplot diametre tronc
 boxplot(data$tronc_diam)
