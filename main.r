@@ -1,8 +1,8 @@
 source('function.r')
-data = read.csv(file="Patrimoine_Arbore.csv", sep = ",")
+data = read.csv(file="lesaintcsv.csv", sep = ",")
 # Cleaning data part
 print(paste("Data dim start",dim(data)))
-
+print(dim(data))
 data = to_utf8(data)
 data = to_lower(data)
 data = convert_data(data)
@@ -17,6 +17,10 @@ data = remove_na_feuillage(data, "feuillage")
 
 data = get_quartier_from_coords(data)
 data = convert_data(data)
+
+data = predict_tronc_diam(data)
+data = predict_age(data)
+data = predict_remarquable(data)
 print(dim(data))
 print(dim(data))
 View(data)
