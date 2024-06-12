@@ -133,7 +133,46 @@ all_str_to_lower = function(data){
 }
 
 
+display_map_arbres_par_quartier <- function (data){
+  # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+  # Initialisation de la carte
+map <- leaflet() %>% addTiles()
 
+# valeurs uniques non NA, = nom des quartiers
+quartiers <- unique(na.omit(data$clc_quartier))
+# Définir un vecteur de couleurs
+colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))
+
+for(i in seq_along(quartiers)) {
+  quartier <- quartiers[i]
+  print(quartier)
+
+  # Filtrer les données pour le quartier en cours
+  quartier_data <- data %>% filter(clc_quartier == quartier)
+
+  # Création de la data frame pour les points du quartier
+  new_points <- data.frame(
+    id = 1:nrow(quartier_data),
+    x = quartier_data$X,
+    y = quartier_data$Y
+  ) %>%
+  st_as_sf(coords = c("x", "y"), crs = 3949) %>%
+  st_transform(4326)
+
+  # Ajout des cercles à la carte avec une couleur différente
+  map <- map %>% addCircles(data = new_points, color = colors[i], group = quartier)
+}
+
+# Ajout de la légende à la carte
+map <- map %>% addLegend(
+  position = "bottomright",
+  colors = colors,
+  labels = quartiers,
+  title = "Quartiers"
+)
+map
+# ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+}
 
 
 
