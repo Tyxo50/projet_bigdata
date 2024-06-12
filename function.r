@@ -9,7 +9,7 @@ to_utf8 <- function(data) {
 convert_data <- function(data, types = c('numeric', 'numeric', 'integer', 'date', 'character', 'character', 'character', 'character', 'integer', 'numeric', 'numeric', 'integer', 'character', 'character', 'character', 'character', 'character', 'bool', 'character', 'date', 'integer', 'integer', 'integer', 'date', 'character', 'character', 'date', 'character', 'character', 'character', 'character', 'date', 'character', 'date', 'character', 'character', 'bool')) {
   i = 1
   for(col in colnames(data)){
-    
+
     if(types[i] == 'numeric'){
       data[[col]] = as.numeric(data[[col]])
     }else if (types[i] == 'integer'){
@@ -56,19 +56,7 @@ norme_euclidienne = function(x1, y1, x2, y2){
   return(sqrt((x2-x1)^2+(y2-y1)^2))
 }
 
-to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
-  data$clc_quartier = as.factor(data$clc_quartier)
-  data$fk_arb_etat = as.factor(data$fk_arb_etat)
-  data$fk_stadedev = as.factor(data$fk_stadedev)
-  data$fk_port = as.factor(data$fk_port)
-  data$fk_pied = as.factor(data$fk_pied)
-  data$fk_situation = as.factor(data$fk_situation)
-  data$fk_revetement = as.factor(data$fk_revetement)
-  data$feuillage = as.factor(data$feuillage)
-  data$nomfrancais = as.factor(data$nomfrancais)
-  
-  return(data)
-}
+
 
 
 put_na_if_empty <- function(data){
@@ -150,12 +138,139 @@ get_quartier_from_coords <- function(data) {
   
   return(data)
 }
+to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
+  data$clc_quartier = as.factor(unlist(data$clc_quartier))
+  data$fk_arb_etat = as.factor(data$fk_arb_etat)
+  data$fk_stadedev = as.factor(data$fk_stadedev)
+  data$fk_port = as.factor(data$fk_port)
+  data$fk_pied = as.factor(data$fk_pied)
+  data$fk_situation = as.factor(data$fk_situation)
+  data$fk_revetement = as.factor(data$fk_revetement)
+  data$feuillage = as.factor(data$feuillage)
+  data$nomfrancais = as.factor(data$nomfrancais)
+
+  return(data)
+}
+
+
+# display_map_arbres_par_quartier <- function (data){
+#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+#   # Initialisation de la carte
+# map <- leaflet() %>% addTiles()
+#
+# # valeurs uniques non NA, = nom des quartiers
+# quartiers <- unique(na.omit(data$clc_quartier))
+# # Définir un vecteur de couleurs
+# colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))
+#
+# for(i in seq_along(quartiers)) {
+#   quartier <- quartiers[i]
+#   #print(quartier)
+#
+#   # Filtrer les données pour le quartier en cours
+#   quartier_data <- data %>% filter(clc_quartier == quartier)
+#
+#   # Création de la data frame pour les points du quartier
+#   new_points <- data.frame(
+#     id = 1:nrow(quartier_data),
+#     lat = quartier_data$X,
+#     lon = quartier_data$Y,
+#     haut_tot = quartier_data$haut_tot
+#     # ajouter les infos utiles pour
+#   )%>% st_as_sf(coords=c("x", "y"), crs = 4326)
+#   #print("aaaaaaaa")
+#   #print(new_points)
+#   # Ajout des cercles à la carte avec une couleur différente
+#   map <- map %>% addCircles(data = new_points, color = colors[i], group = quartier, popup = ~paste("Taille : ", data$haut_tot))
+# }
+#
+# # Ajout de la légende à la carte
+# map <- map %>% addLegend(
+#   position = "bottomright",
+#   colors = colors,
+#   labels = quartiers,
+#   title = "Quartiers"
+# )
+# map
+# # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+# }
+
+
+
+
+
+
+
+# display_map_arbres_par_quartier_2 <- function (data){
+#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+#   # Initialisation de la carte
+#
+#
+#   # valeurs uniques non NA, = nom des quartiers
+#   quartiers <- unique(na.omit(data$clc_quartier))
+#   # Définir un vecteur de couleurs
+#   colors <- colorFactor(palette =  c("red", "blue", "green", "orange", "purple", "cyan"), unique(data$clc_quartier))
+#
+#   new_points <- data.frame(
+#     x = data$X,
+#     y = data$Y
+#   ) %>% st_as_sf(coords=c("x", "y"), crs = 4326)
+#   #print("aaaaaaaa")
+#   #print(new_points)
+#
+#
+#   new_points %>% leaflet() %>% addTiles()%>% addCircles(data = new_points, color = colors(data$clc_quartier))%>% addLegend(
+#     position = "bottomright",
+#     colors = colors,
+#     labels = quartiers,
+#     title = "Quartiers"
+#   )
+#   # Ajout des cercles à la carte avec une couleur différente
+#
+#
+#   # Ajout de la légende à la carte
+#   new_points
+#   # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+# }
+
+
+
+
+predict_tronc_diam <- function(data) {
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
+
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
+
+  rows_to_predict <- data[is.na(data$tronc_diam), ]
+
+  if(nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict)
+
+    data$tronc_diam[is.na(data$tronc_diam)] <- predictions
+  }
+
+  return(data)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 display_map_arbres_par_quartier <- function (data){
   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
   # Initialisation de la carte
-map <- leaflet() %>% addTiles()
+map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
 
 # valeurs uniques non NA, = nom des quartiers
 quartiers <- unique(na.omit(data$clc_quartier))
@@ -164,22 +279,23 @@ colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan")
 
 for(i in seq_along(quartiers)) {
   quartier <- quartiers[i]
-  print(quartier)
+  #print(quartier)
 
   # Filtrer les données pour le quartier en cours
   quartier_data <- data %>% filter(clc_quartier == quartier)
 
+  quartier_data$tronc_diam <- as.numeric(quartier_data$tronc_diam)
+  print(quartier_data$tronc_diam)
   # Création de la data frame pour les points du quartier
-  new_points <- data.frame(
-    id = 1:nrow(quartier_data),
-    x = quartier_data$X,
-    y = quartier_data$Y
-  ) %>%
-  st_as_sf(coords = c("x", "y"), crs = 3949) %>%
-  st_transform(4326)
-
+  # new_points <- data.frame(
+  #   id = 1:nrow(quartier_data),
+  #   lat = quartier_data$X,
+  #   lon = quartier_data$Y,
+  #   taille = quartier_data$haut_tot
+  # )
   # Ajout des cercles à la carte avec une couleur différente
-  map <- map %>% addCircles(data = new_points, color = colors[i], group = quartier)
+  #View(quartier_data$tronc_diam)
+  map <- map %>% addCircles(data = quartier_data, radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20), lat=quartier_data$X, lng=quartier_data$Y, color = colors[i],  group = quartier, popup = ~paste("Taille : ", quartier_data$haut_tot, "<br>Quartier : ", quartier, "<br>Diam : ", quartier_data$tronc_diam))
 }
 
 # Ajout de la légende à la carte
@@ -192,4 +308,3 @@ map <- map %>% addLegend(
 map
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
 }
-
