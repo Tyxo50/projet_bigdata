@@ -196,6 +196,24 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
 # }
 
 
+predict_tronc_diam <- function(data) {
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
+  
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
+  
+  rows_to_predict <- data[is.na(data$tronc_diam), ]
+  
+  if(nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict)
+    
+    data$tronc_diam[is.na(data$tronc_diam)] <- predictions
+  }
+  
+  return(data)
+}
+
+
+
 
 
 
