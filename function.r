@@ -165,50 +165,6 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
   return(data)
 }
 
-
-# display_map_arbres_par_quartier <- function (data){
-#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
-#   # Initialisation de la carte
-# map <- leaflet() %>% addTiles()
-#
-# # valeurs uniques non NA, = nom des quartiers
-# quartiers <- unique(na.omit(data$clc_quartier))
-# # Définir un vecteur de couleurs
-# colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))
-#
-# for(i in seq_along(quartiers)) {
-#   quartier <- quartiers[i]
-#   #print(quartier)
-#
-#   # Filtrer les données pour le quartier en cours
-#   quartier_data <- data %>% filter(clc_quartier == quartier)
-#
-#   # Création de la data frame pour les points du quartier
-#   new_points <- data.frame(
-#     id = 1:nrow(quartier_data),
-#     lat = quartier_data$X,
-#     lon = quartier_data$Y,
-#     haut_tot = quartier_data$haut_tot
-#     # ajouter les infos utiles pour
-#   )%>% st_as_sf(coords=c("x", "y"), crs = 4326)
-#   #print("aaaaaaaa")
-#   #print(new_points)
-#   # Ajout des cercles à la carte avec une couleur différente
-#   map <- map %>% addCircles(data = new_points, color = colors[i], group = quartier, popup = ~paste("Taille : ", data$haut_tot))
-# }
-#
-# # Ajout de la légende à la carte
-# map <- map %>% addLegend(
-#   position = "bottomright",
-#   colors = colors,
-#   labels = quartiers,
-#   title = "Quartiers"
-# )
-# map
-# # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
-# }
-
-
 predict_tronc_diam <- function(data) {
   data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim), ]
   
@@ -255,46 +211,6 @@ predict_remarquable <- function(data) {
   }
   return(data)
 }
-
-
-
-
-
-
-
-
-# display_map_arbres_par_quartier_2 <- function (data){
-#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
-#   # Initialisation de la carte
-#
-#
-#   # valeurs uniques non NA, = nom des quartiers
-#   quartiers <- unique(na.omit(data$clc_quartier))
-#   # Définir un vecteur de couleurs
-#   colors <- colorFactor(palette =  c("red", "blue", "green", "orange", "purple", "cyan"), unique(data$clc_quartier))
-#
-#   new_points <- data.frame(
-#     x = data$X,
-#     y = data$Y
-#   ) %>% st_as_sf(coords=c("x", "y"), crs = 4326)
-#   #print("aaaaaaaa")
-#   #print(new_points)
-#
-#
-#   new_points %>% leaflet() %>% addTiles()%>% addCircles(data = new_points, color = colors(data$clc_quartier))%>% addLegend(
-#     position = "bottomright",
-#     colors = colors,
-#     labels = quartiers,
-#     title = "Quartiers"
-#   )
-#   # Ajout des cercles à la carte avec une couleur différente
-#
-#
-#   # Ajout de la légende à la carte
-#   new_points
-#   # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
-# }
-
 
 
 
@@ -445,4 +361,11 @@ map <- map %>% addLegend(
 )
 map
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+}
+clc_zone_indus <- function (data){
+  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (A.Europe)")] <- tolower("Zone industrielle le Royeux")
+  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (G.Pompidou)")] <- tolower("Zone industrielle le Royeux")
+  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (G.Eiffel)")] <- tolower("Zone industrielle le Royeux")
+  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (bassin)")] <- tolower("Zone industrielle le Royeux")
+  return(data)
 }
