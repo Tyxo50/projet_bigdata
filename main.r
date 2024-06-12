@@ -23,6 +23,10 @@ data <- remove_na_feuillage(data, "feuillage")
 
 
 
+library(leaflet)
+library(leaflet.extras)
+library(sf)
+library(dplyr)
 
 print(dim(data))
 print(dim(data))
