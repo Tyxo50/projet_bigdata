@@ -215,9 +215,10 @@ map <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "harly")])), 
   addCircles(color="red")
 
 
-# =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
 
-# Initialisation de la carte
+display_map_arbres_par_quartier <- function (data){
+  # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+  # Initialisation de la carte
 map <- leaflet() %>% addTiles()
 
 # valeurs uniques non NA, = nom des quartiers
@@ -254,6 +255,8 @@ map <- map %>% addLegend(
 )
 map
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+}
+
 
 new_points <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "quartier de neuville")])), x= data$X[which(data$clc_quartier == "quartier de neuville")],
                   y=data$Y[which(data$clc_quartier == "quartier de neuville")]) %>%
