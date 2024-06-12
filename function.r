@@ -215,18 +215,19 @@ predict_remarquable <- function(data) {
 
 
 predict_tronc_diam <- function(data) {
-  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
-
-  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
-
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim), ]
+  
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage + age_estim, data = data_temp)
+  print(summary(model))
+  
   rows_to_predict <- data[is.na(data$tronc_diam), ]
-
+  
   if(nrow(rows_to_predict) > 0) {
     predictions <- predict(model, newdata = rows_to_predict)
-
-    data$tronc_diam[is.na(data$tronc_diam)] <- predictions
+    
+    data$tronc_diam[is.na(data$tronc_diam)] <- round(predictions)
   }
-
+  
   return(data)
 }
 
@@ -247,32 +248,23 @@ predict_age <- function(data) {
 }
 
 predict_remarquable <- function(data) {
+  data$remarquable <- ifelse(data$remarquable == "oui", 1, ifelse(data$remarquable == "non" | data$remarquable == "", 0, NA))
+  
   data_temp <- data[!is.na(data$remarquable) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$nomfrancais), ]
-  print(data$remarquable)
+  
   model <- glm(remarquable ~ tronc_diam + haut_tot + fk_stadedev + nomfrancais, data = data_temp, family = "binomial")
+  
   rows_to_predict <- data[is.na(data$remarquable), ]
   
   if (nrow(rows_to_predict) > 0) {
     predictions <- predict(model, newdata = rows_to_predict, type = "response")
-    predicted_classes <- ifelse(predictions >= 0.5, 1, 0)
-    data$remarquable[is.na(data$remarquable)] <- predicted_classes
+    data$remarquable[is.na(data$remarquable)] <- round(predictions)
   }
+  
+  data$remarquable <- ifelse(data$remarquable == 1, "oui", "non")
   
   return(data)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 display_map_arbres_par_quartier <- function (data){
