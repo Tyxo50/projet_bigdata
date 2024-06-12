@@ -173,7 +173,7 @@ barplot(prop.table(table(data$fk_stadedev)), las=2)
 
 
 # arbres par type de feuillage
-barplot(prop.table(table(data$feuillage)), las=2)
+barplot(prop.table(table(data$feuillage)), las=1)
 
 
 # animals <- c("cat", "dog",  "dog", "dog", "dog", "dog", "dog", "dog", "cat", "cat", "bird")
@@ -181,8 +181,105 @@ barplot(prop.table(table(data$feuillage)), las=2)
 # #hist(table(animalFactor), freq=TRUE, xlab = levels(animalFactor), ylab = "Frequencies")
 # barplot(prop.table(table(animals)))
 
+n = 10
+x = sample(data$X, n)
+y = sample(data$Y, n)
+data$Y[data$clc_quartier == "harly"][!is.na(data$Y[data$clc_quartier == "harly"])]
+
+# pour tous les points
+c = st_transform(st_as_sf(data, coords =c("X", "Y"), crs=3949), crs=4326)
+View(c)
 
 
 
 
+
+
+coo_4326 <- data.frame(id= c(1:length(data$X)), x= data$X, y=data$Y) %>%
+  st_as_sf(coords=c("x", "y"), crs=3949) %>%
+  st_transform(4326)
+
+#data[["geometry"]] <- coo_4326
+data = cbind(data, coo_4326$geometry)
+
+
+# pour un quartier en particulier
+map <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "harly")])), x= data$X[which(data$clc_quartier == "harly")],
+                   y=data$Y[which(data$clc_quartier == "harly")]) %>%
+  st_as_sf(coords=c("x", "y"), crs=3949) %>%
+  st_transform(4326) 
+
+
+  map = leaflet(coo) %>%
+  addTiles() #%>%
+  addCircles(color="red")
+
+
+# =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+
+# Initialisation de la carte
+map <- leaflet() %>% addTiles()
+
+# valeurs uniques non NA, = nom des quartiers
+quartiers <- unique(na.omit(data$clc_quartier))
+# Définir un vecteur de couleurs
+colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))
+
+for(i in seq_along(quartiers)) {
+  quartier <- quartiers[i]
+  print(quartier)
+
+  # Filtrer les données pour le quartier en cours
+  quartier_data <- data %>% filter(clc_quartier == quartier)
+
+  # Création de la data frame pour les points du quartier
+  new_points <- data.frame(
+    id = 1:nrow(quartier_data),
+    x = quartier_data$X,
+    y = quartier_data$Y
+  ) %>%
+  st_as_sf(coords = c("x", "y"), crs = 3949) %>%
+  st_transform(4326)
+
+  # Ajout des cercles à la carte avec une couleur différente
+  map <- map %>% addCircles(data = new_points, color = colors[i], group = quartier)
+}
+
+# Ajout de la légende à la carte
+map <- map %>% addLegend(
+  position = "bottomright",
+  colors = colors,
+  labels = quartiers,
+  title = "Quartiers"
+)
+map
+# ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+
+new_points <- data.frame(id= c(1:length(data$X[which(data$clc_quartier == "quartier de neuville")])), x= data$X[which(data$clc_quartier == "quartier de neuville")],
+                  y=data$Y[which(data$clc_quartier == "quartier de neuville")]) %>%
+  st_as_sf(coords=c("x", "y"), crs=3949) %>%
+  st_transform(4326) 
+
+data$clc_quartier[which(is.na(data$clc_quartier))]
+
+map %>%
+  addCircles(data = new_points, color="green")
+
+
+
+
+
+
+
+View(coo)
+
+ # ------------
+# head(c)
+# head(data)
+# print(dim(c))
+# print(dim(data))
+
+
+# l = data[which(data$clc_quartier == "harly",)]
+# View(l)
 

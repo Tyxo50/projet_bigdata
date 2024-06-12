@@ -56,6 +56,20 @@ norme_euclidienne = function(x1, y1, x2, y2){
   return(sqrt((x2-x1)^2+(y2-y1)^2))
 }
 
+to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
+  data$clc_quartier = as.factor(data$clc_quartier)
+  data$fk_arb_etat = as.factor(data$fk_arb_etat)
+  data$fk_stadedev = as.factor(data$fk_stadedev)
+  data$fk_port = as.factor(data$fk_port)
+  data$fk_pied = as.factor(data$fk_pied)
+  data$fk_situation = as.factor(data$fk_situation)
+  data$fk_revetement = as.factor(data$fk_revetement)
+  data$feuillage = as.factor(data$feuillage)
+  data$nomfrancais = as.factor(data$nomfrancais)
+  
+  return(data)
+}
+
 
 put_na_if_empty <- function(data){
   for (col in colnames(data)) {
