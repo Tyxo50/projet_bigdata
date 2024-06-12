@@ -388,12 +388,12 @@ for(i in seq_along(quartiers)) {
   # Ajout des cercles à la carte avec une couleur différente
   #View(quartier_data$tronc_diam)
   map <- map %>% addCircles(data = quartier_data,
-                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),
+                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
                             lat=quartier_data$X,
                             lng=quartier_data$Y,
-                            color = ~ifelse(remarquable == "oui", "black", colors[i]),
+                            color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
                             group = quartier,
-                            popup = ~paste("Taille : ", quartier_data$haut_tot, "<br>Quartier : ", quartier, "<br>Diam : ", quartier_data$tronc_diam))
+                            popup = ~paste("Taille : ", quartier_data$haut_tot, "<br>Quartier : ", quartier, "<br>Diam : ", quartier_data$tronc_diam)) # infos en cliquant sur la pasatille
 }
 
 # Ajout de la légende à la carte
@@ -402,6 +402,46 @@ map <- map %>% addLegend(
   colors = colors,
   labels = quartiers,
   title = "Quartiers"
+)
+map
+# ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+}
+
+
+display_map_arbres_par_feuillage <- function (data){
+  # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+  # Initialisation de la carte
+map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
+
+# valeurs uniques non NA, = nom des quartiers
+feuillages <- unique(na.omit(data$feuillage))
+# Définir un vecteur de couleurs
+colors <- colorRampPalette(c("red", "blue"))(length(feuillages))
+
+for(i in seq_along(feuillages)) {
+  feuil <- feuillages[i]
+  #print(quartier)
+
+  # Filtrer les données pour le quartier en cours
+  feuillage_data <- data %>% filter(feuillage == feuil)
+
+  feuillage_datatronc_diam <- as.numeric(feuillage_data$feuillage)
+
+  map <- map %>% addCircles(data = feuillage_data,
+                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
+                            lat=feuillage_data$X,
+                            lng=feuillage_data$Y,
+                            color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
+                            group = feuil,
+                            popup = ~paste("Feuillage : ", feuillage_data$feuillage,"<br>Taille : ", feuillage_data$haut_tot, "<br>Quartier : ", feuillage_data$clc_quartier, "<br>Diam : ", feuillage_data$tronc_diam)) # infos en cliquant sur la pasatille
+}
+
+# Ajout de la légende à la carte
+map <- map %>% addLegend(
+  position = "bottomright",
+  colors = colors,
+  labels = feuillages,
+  title = "Feuillages"
 )
 map
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
