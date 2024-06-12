@@ -56,7 +56,20 @@ norme_euclidienne = function(x1, y1, x2, y2){
   return(sqrt((x2-x1)^2+(y2-y1)^2))
 }
 
-
+to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
+  data$clc_quartier = as.factor(data$clc_quartier)
+  data$fk_arb_etat = as.factor(data$fk_arb_etat)
+  data$fk_stadedev = as.factor(data$fk_stadedev)
+  data$fk_port = as.factor(data$fk_port)
+  data$fk_pied = as.factor(data$fk_pied)
+  data$fk_situation = as.factor(data$fk_situation)
+  data$fk_revetement = as.factor(data$fk_revetement)
+  data$feuillage = as.factor(data$feuillage)
+  data$nomfrancais = as.factor(data$nomfrancais)
+  data$remarquable = as.factor(data$remarquable)
+  
+  return(data)
+}
 
 
 put_na_if_empty <- function(data){
@@ -197,16 +210,48 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
 
 
 predict_tronc_diam <- function(data) {
-  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim), ]
   
-  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage + age_estim, data = data_temp)
+  print(summary(model))
   
   rows_to_predict <- data[is.na(data$tronc_diam), ]
   
   if(nrow(rows_to_predict) > 0) {
     predictions <- predict(model, newdata = rows_to_predict)
     
-    data$tronc_diam[is.na(data$tronc_diam)] <- predictions
+    data$tronc_diam[is.na(data$tronc_diam)] <- round(predictions)
+  }
+  
+  return(data)
+}
+
+predict_age <- function(data) {
+  data_temp <- data[!is.na(data$age_estim) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$haut_tronc), ]
+  
+  model <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc + fk_stadedev, data = data_temp)
+  print(summary(model))
+  rows_to_predict <- data[is.na(data$age_estim), ]
+  
+  if(nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict)
+    
+    data$age_estim[is.na(data$age_estim)] <- round(predictions)
+  }
+  
+  return(data)
+}
+
+predict_remarquable <- function(data) {
+  data_temp <- data[!is.na(data$remarquable) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$nomfrancais), ]
+  print(data$remarquable)
+  model <- glm(remarquable ~ tronc_diam + haut_tot + fk_stadedev + nomfrancais, data = data_temp, family = "binomial")
+  rows_to_predict <- data[is.na(data$remarquable), ]
+  
+  if (nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict, type = "response")
+    predicted_classes <- ifelse(predictions >= 0.5, 1, 0)
+    data$remarquable[is.na(data$remarquable)] <- predicted_classes
   }
   return(data)
 }
@@ -269,6 +314,36 @@ predict_tronc_diam <- function(data) {
   return(data)
 }
 
+predict_age <- function(data) {
+  data_temp <- data[!is.na(data$age_estim) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$haut_tronc), ]
+  
+  model <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc + fk_stadedev, data = data_temp)
+  print(summary(model))
+  rows_to_predict <- data[is.na(data$age_estim), ]
+  
+  if(nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict)
+    
+    data$age_estim[is.na(data$age_estim)] <- round(predictions)
+  }
+  
+  return(data)
+}
+
+predict_remarquable <- function(data) {
+  data_temp <- data[!is.na(data$remarquable) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$nomfrancais), ]
+  print(data$remarquable)
+  model <- glm(remarquable ~ tronc_diam + haut_tot + fk_stadedev + nomfrancais, data = data_temp, family = "binomial")
+  rows_to_predict <- data[is.na(data$remarquable), ]
+  
+  if (nrow(rows_to_predict) > 0) {
+    predictions <- predict(model, newdata = rows_to_predict, type = "response")
+    predicted_classes <- ifelse(predictions >= 0.5, 1, 0)
+    data$remarquable[is.na(data$remarquable)] <- predicted_classes
+  }
+  
+  return(data)
+}
 
 
 
