@@ -1,3 +1,9 @@
+library(leaflet)
+library(httr)
+library(jsonlite)
+library(sf)
+library(tidyverse)
+
 to_utf8 <- function(data) {
   for (identifier in colnames(data)) {
     data[[identifier]] = iconv(data[[identifier]], from = "latin1", to = "UTF-8")
@@ -66,7 +72,7 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
   data$fk_revetement = as.factor(data$fk_revetement)
   data$feuillage = as.factor(data$feuillage)
   data$nomfrancais = as.factor(data$nomfrancais)
-  data$nomfrancais = as.factor(data$nomlatin)
+  data$nomlatin = as.factor(data$nomlatin)
   data$remarquable = as.factor(data$remarquable)
   
   return(data)
@@ -124,12 +130,6 @@ remove_na_feuillage <- function(data, colonne) {
   return(data)
 }
 
-library(leaflet)
-library(httr)
-library(jsonlite)
-library(sf)
-
-
 get_quartier_from_coords <- function(data) {
   coords <- st_transform(st_as_sf(data, coords = c("X", "Y"), crs =  3949), crs = 4326)
   coords <- st_coordinates(coords)
@@ -149,20 +149,6 @@ get_quartier_from_coords <- function(data) {
       }
     }
   }
-  
-  return(data)
-}
-to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
-  data$clc_quartier = as.factor(unlist(data$clc_quartier))
-  data$fk_arb_etat = as.factor(data$fk_arb_etat)
-  data$fk_stadedev = as.factor(data$fk_stadedev)
-  data$fk_port = as.factor(data$fk_port)
-  data$fk_pied = as.factor(data$fk_pied)
-  data$fk_situation = as.factor(data$fk_situation)
-  data$fk_revetement = as.factor(data$fk_revetement)
-  data$feuillage = as.factor(data$feuillage)
-  data$nomfrancais = as.factor(data$nomfrancais)
-  data$remarquable = as.factor(data$remarquable)
 
   return(data)
 }
@@ -217,11 +203,10 @@ predict_remarquable <- function(data) {
 
 
 predict_tronc_diam <- function(data) {
-  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim), ]
-  
-  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage + age_estim, data = data_temp)
-  print(summary(model))
-  
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
+
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
+
   rows_to_predict <- data[is.na(data$tronc_diam), ]
   
   if(nrow(rows_to_predict) > 0) {
@@ -234,9 +219,9 @@ predict_tronc_diam <- function(data) {
 }
 
 predict_age <- function(data) {
-  data_temp <- data[!is.na(data$age_estim) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$haut_tronc), ]
+  data_temp <- data[!is.na(data$age_estim) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$haut_tronc), ]
   
-  model <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc + fk_stadedev, data = data_temp)
+  model <- lm(age_estim ~ tronc_diam + haut_tot + haut_tronc, data = data_temp)
   print(summary(model))
   rows_to_predict <- data[is.na(data$age_estim), ]
   
@@ -255,7 +240,6 @@ predict_remarquable <- function(data) {
   data_temp <- data[!is.na(data$remarquable) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$nomfrancais), ]
   
   model <- glm(remarquable ~ tronc_diam + haut_tot + fk_stadedev + nomfrancais, data = data_temp, family = "binomial")
-  
   rows_to_predict <- data[is.na(data$remarquable), ]
   
   if (nrow(rows_to_predict) > 0) {
