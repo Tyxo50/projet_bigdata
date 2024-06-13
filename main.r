@@ -21,14 +21,14 @@ source('function.r')
 # data = predict_age(data)
 # data = predict_remarquable(data)
 
-lien_variable_quantitative(data)
-lien_variable_qualitative(data)
-lien_variable_quan_qual(data)
+# lien_variable_quantitative(data)
+# lien_variable_qualitative(data)
+# lien_variable_quan_qual(data)
 
 
-print(dim(data))
-print(dim(data))
-View(data)
+# print(dim(data))
+# print(dim(data))
+# View(data)
 
 
 import_csv_avec_api <- function (){
@@ -60,9 +60,18 @@ import_csv_propre <- function (){
 
   return(data)
 }
+# ajouter les donnees des predict
+ajout_valeurs_predict <- function (data){
+  data <- predict_tronc_diam(data)
+  data <- predict_age(data)
+  data <- predict_remarquable(data)
+  return(data)
+}
 
 data <- import_csv_avec_api()
-#data <- import_csv_propre()
+data <- import_csv_propre()
+
+#data <- ajout_valeurs_predict(data)
 
 # Decommenter pour voir après avoir prepare le dataframe data.
 # display_map_arbres_par_quartier(data)

@@ -4,6 +4,9 @@ library(jsonlite)
 library(sf)
 library(tidyverse)
 library(dplyr)
+library(htmlwidgets)
+library(pandoc)
+library(ggplot2)
 
 to_utf8 <- function(data) {
   for (identifier in colnames(data)) {
@@ -255,33 +258,24 @@ predict_remarquable <- function(data) {
 
 
 display_map_arbres_par_quartier <- function (data){
-    # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
-    # Initialisation de la carte
+  # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+  # Initialisation de la carte
   map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
 
   # valeurs uniques non NA, = nom des quartiers
   quartiers <- unique(na.omit(data$clc_quartier))
   # Définir un vecteur de couleurs
-  colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))
+  colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(quartiers))# couleurs de la legende
 
   for(i in seq_along(quartiers)) {
-    quartier <- quartiers[i]
+    quartier <- quartiers[i]# pour chaque quartier
     #print(quartier)
 
     # Filtrer les données pour le quartier en cours
-    quartier_data <- data %>% filter(clc_quartier == quartier)
+    quartier_data <- data %>% filter(clc_quartier == quartier)# on prend que les donnees concernees
 
-    quartier_data$tronc_diam <- as.numeric(quartier_data$tronc_diam)
-    #print(quartier_data$tronc_diam)
-    # Création de la data frame pour les points du quartier
-    # new_points <- data.frame(
-    #   id = 1:nrow(quartier_data),
-    #   lat = quartier_data$X,
-    #   lon = quartier_data$Y,
-    #   taille = quartier_data$haut_tot
-    # )
-    # Ajout des cercles à la carte avec une couleur différente
-    #View(quartier_data$tronc_diam)
+    quartier_data$tronc_diam <- as.numeric(quartier_data$tronc_diam) # juste au cas où
+
     map <- map %>% addCircles(data = quartier_data,
                               radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
                               lat=quartier_data$X,
@@ -299,7 +293,7 @@ display_map_arbres_par_quartier <- function (data){
     title = "Quartiers"
   )
   map
-  #saveWidget(map, file="map_quartiers.html")
+  #saveWidget(map, file="map_quartiers.html") # enregistrer le html
 
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
 }
@@ -308,42 +302,43 @@ display_map_arbres_par_quartier <- function (data){
 display_map_arbres_par_feuillage <- function (data){
   # =========== DEBUT AFFICHAGE MAP PAR FEUILLAGE
   # Initialisation de la carte
-map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
+  map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
 
-# valeurs uniques non NA, = nom des quartiers
-feuillages <- unique(na.omit(data$feuillage))
-# Définir un vecteur de couleurs
-colors <- colorRampPalette(c("green", "orange"))(length(feuillages))
+  # valeurs uniques non NA, = nom des quartiers
+  feuillages <- unique(na.omit(data$feuillage))
 
-for(i in seq_along(feuillages)) {
-  feuil <- feuillages[i]
-  #print(quartier)
 
-  # Filtrer les données pour le quartier en cours
-  feuillage_data <- data %>% filter(feuillage == feuil)
+  colors <- colorRampPalette(c("green", "orange"))(length(feuillages)) # vecteur de couleurs
 
-  #feuillage_data <- as.numeric(feuillage_data$feuillage)
+  for(i in seq_along(feuillages)) {
+    feuil <- feuillages[i]
+    #print(feuil)
 
-  map <- map %>% addCircles(data = feuillage_data,
-                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
-                            lat=feuillage_data$X,
-                            lng=feuillage_data$Y,
-                            color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
-                            group = feuil,
-                            popup = ~paste("Feuillage : ", feuillage_data$feuillage,"<br>Taille : ", feuillage_data$haut_tot, "<br>Quartier : ", feuillage_data$clc_quartier, "<br>Diam : ", feuillage_data$tronc_diam)) # infos en cliquant sur la pasatille
-}
+    # Filtrer les données pour le quartier en cours
+    feuillage_data <- data %>% filter(feuillage == feuil)
 
-# Ajout de la légende à la carte
-map <- map %>% addLegend(
-  position = "bottomright",
-  colors = colors,
-  labels = feuillages,
-  title = "Feuillages"
-)
-map
-    #saveWidget(map, file="map_feuillages.html")
+    #feuillage_data <- as.numeric(feuillage_data$feuillage)
 
-# ------ FIN AFFICHER MAP PAR FEUILLAGE
+    map <- map %>% addCircles(data = feuillage_data,
+                              radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
+                              lat=feuillage_data$X,
+                              lng=feuillage_data$Y,
+                              color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
+                              group = feuil,
+                              popup = ~paste("Feuillage : ", feuillage_data$feuillage,"<br>Taille : ", feuillage_data$haut_tot, "<br>Quartier : ", feuillage_data$clc_quartier, "<br>Diam : ", feuillage_data$tronc_diam)) # infos en cliquant sur la pasatille
+  }
+
+  # Ajout de la légende à la carte
+  map <- map %>% addLegend(
+    position = "bottomright",
+    colors = colors,
+    labels = feuillages,
+    title = "Feuillages"
+  )
+  map
+      #saveWidget(map, file="map_feuillages.html") # enregistrer le html
+
+  # ------ FIN AFFICHER MAP PAR FEUILLAGE
 }
 clc_zone_indus <- function (data){
   data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (A.Europe)")] <- tolower("Zone industrielle le Royeux")
@@ -368,7 +363,7 @@ display_map_arbres_par_stadedev <- function (data){
   # valeurs uniques non NA, = nom des quartiers
   stadedevs <- unique(na.omit(data$fk_stadedev))
   stadedevs <- stadedevs[stadedevs !=" "]
-  # Définir un vecteur de couleurs
+
   colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(stadedevs))
 
   for(i in seq_along(stadedevs)) {
@@ -397,7 +392,7 @@ display_map_arbres_par_stadedev <- function (data){
     title = "Stade de developpement"
   )
   map
-    #saveWidget(map, file="map_stadedev.html")
+    #saveWidget(map, file="map_stadedev.html") # enregistrer le html
 
   # ------ FIN AFFICHER MAP PAR STADE DE DEVELOPPEMENT
 }
