@@ -16,6 +16,7 @@ data = remove_na_feuillage(data, "feuillage")
 
 data = get_quartier_from_coords(data)
 data = convert_data(data)
+data = to_factor(data)
 print(dim(data))
 print(dim(data))
 View(data)

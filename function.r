@@ -66,6 +66,7 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
   data$fk_revetement = as.factor(data$fk_revetement)
   data$feuillage = as.factor(data$feuillage)
   data$nomfrancais = as.factor(data$nomfrancais)
+  data$nomfrancais = as.factor(data$nomlatin)
   data$remarquable = as.factor(data$remarquable)
   
   return(data)
@@ -161,6 +162,7 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
   data$fk_revetement = as.factor(data$fk_revetement)
   data$feuillage = as.factor(data$feuillage)
   data$nomfrancais = as.factor(data$nomfrancais)
+  data$remarquable = as.factor(data$remarquable)
 
   return(data)
 }
@@ -341,7 +343,7 @@ for(i in seq_along(feuillages)) {
   # Filtrer les données pour le quartier en cours
   feuillage_data <- data %>% filter(feuillage == feuil)
 
-  feuillage_datatronc_diam <- as.numeric(feuillage_data$feuillage)
+  #feuillage_data <- as.numeric(feuillage_data$feuillage)
 
   map <- map %>% addCircles(data = feuillage_data,
                             radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
@@ -369,3 +371,51 @@ clc_zone_indus <- function (data){
   data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (bassin)")] <- tolower("Zone industrielle le Royeux")
   return(data)
 }
+
+
+
+
+
+
+
+
+
+
+# display_map_arbres_par_stade_dev <- function (data){
+#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+#   # Initialisation de la carte
+# map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
+#
+# # valeurs uniques non NA, = nom des quartiers
+# stade_devs <- unique(na.omit(data$stade_dev))
+# # Définir un vecteur de couleurs
+# colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(stade_devs))
+#
+# for(i in seq_along(stade_devs)) {
+#   sdv <- stade_devs[i]
+#   #print(quartier)
+#
+#   # Filtrer les données pour le quartier en cours
+#   stade_dev_data <- data %>% filter(stade_dev == sdv)
+#
+#   #feuillage_datatronc_diam <- as.numeric(feuillage_data$feuillage)
+#
+#   map <- map %>% addCircles(data = stade_dev_data,
+#                             radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
+#                             lat=stade_dev_data$X,
+#                             lng=stade_dev_data$Y,
+#                             color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
+#                             group = feuil,
+#                             popup = ~paste("Feuillage : ", stade_dev_data$feuillage,"<br>Taille : ", stade_dev_data$haut_tot, "<br>Quartier : ", stade_dev_data$clc_quartier, "<br>Diam : ", stade_dev_data$tronc_diam)) # infos en cliquant sur la pasatille
+# }
+#
+# # Ajout de la légende à la carte
+# map <- map %>% addLegend(
+#   position = "bottomright",
+#   colors = colors,
+#   labels = stade_devs,
+#   title = "Stade de dev"
+# )
+# map
+# # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+# }
