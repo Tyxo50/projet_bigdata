@@ -150,8 +150,9 @@ data = all_str_to_lower(data)
 
 
 # ================= PLOTS ==================
-# barplot arbres par quartier
+# barplot nb arbres par quartier
 barplot(prop.table(table(data$feuillage)), las=2)
+
 
 # boxplot diametre tronc
 boxplot(data$tronc_diam)
@@ -286,3 +287,10 @@ View(coo)
 # l = data[which(data$clc_quartier == "harly",)]
 # View(l)
 
+
+clc_zone_indus <- function (data){
+  data$clc_quartier[data$clc_secteur == "Zone industrielle le Royeux (A.Europe)"] <- "Zone industrielle le Royeux"
+  data$clc_quartier[data$clc_secteur == "Zone industrielle le Royeux (G.Pompidou)"] <- "Zone industrielle le Royeux"
+  data$clc_quartier[data$clc_secteur == "Zone industrielle le Royeux (G.Eiffel)"] <- "Zone industrielle le Royeux"
+  data$clc_quartier[data$clc_secteur == "Zone industrielle le Royeux (bassin)"] <- "Zone industrielle le Royeux"
+}

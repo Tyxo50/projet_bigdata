@@ -72,7 +72,7 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
   data$fk_revetement = as.factor(data$fk_revetement)
   data$feuillage = as.factor(data$feuillage)
   data$nomfrancais = as.factor(data$nomfrancais)
-  data$nomfrancais = as.factor(data$nomlatin)
+  data$nomlatin = as.factor(data$nomlatin)
   data$remarquable = as.factor(data$remarquable)
   
   return(data)
@@ -152,20 +152,7 @@ get_quartier_from_coords <- function(data) {
   
   return(data)
 }
-to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifier la suite IA peut etre
-  data$clc_quartier = as.factor(unlist(data$clc_quartier))
-  data$fk_arb_etat = as.factor(data$fk_arb_etat)
-  data$fk_stadedev = as.factor(data$fk_stadedev)
-  data$fk_port = as.factor(data$fk_port)
-  data$fk_pied = as.factor(data$fk_pied)
-  data$fk_situation = as.factor(data$fk_situation)
-  data$fk_revetement = as.factor(data$fk_revetement)
-  data$feuillage = as.factor(data$feuillage)
-  data$nomfrancais = as.factor(data$nomfrancais)
-  data$remarquable = as.factor(data$remarquable)
 
-  return(data)
-}
 
 predict_tronc_diam <- function(data) {
   data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim), ]
@@ -215,12 +202,52 @@ predict_remarquable <- function(data) {
 }
 
 
+
+
+
+
+
+
+# display_map_arbres_par_quartier_2 <- function (data){
+#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
+#   # Initialisation de la carte
+#
+#
+#   # valeurs uniques non NA, = nom des quartiers
+#   quartiers <- unique(na.omit(data$clc_quartier))
+#   # Définir un vecteur de couleurs
+#   colors <- colorFactor(palette =  c("red", "blue", "green", "orange", "purple", "cyan"), unique(data$clc_quartier))
+#
+#   new_points <- data.frame(
+#     x = data$X,
+#     y = data$Y
+#   ) %>% st_as_sf(coords=c("x", "y"), crs = 4326)
+#   #print("aaaaaaaa")
+#   #print(new_points)
+#
+#
+#   new_points %>% leaflet() %>% addTiles()%>% addCircles(data = new_points, color = colors(data$clc_quartier))%>% addLegend(
+#     position = "bottomright",
+#     colors = colors,
+#     labels = quartiers,
+#     title = "Quartiers"
+#   )
+#   # Ajout des cercles à la carte avec une couleur différente
+#
+#
+#   # Ajout de la légende à la carte
+#   new_points
+#   # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
+# }
+
+
+
+
 predict_tronc_diam <- function(data) {
-  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev) & !is.na(data$age_estim) , ]
-  
-  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage + age_estim, data = data_temp)
-  print(summary(model))
-  
+  data_temp <- data[!is.na(data$haut_tronc) & !is.na(data$haut_tot) & !is.na(data$feuillage) & !is.na(data$fk_stadedev), ]
+
+  model <- lm(tronc_diam ~ haut_tronc + haut_tot + fk_stadedev + feuillage, data = data_temp)
+
   rows_to_predict <- data[is.na(data$tronc_diam), ]
   
   if(nrow(rows_to_predict) > 0) {
@@ -254,7 +281,6 @@ predict_remarquable <- function(data) {
   data_temp <- data[!is.na(data$remarquable) & !is.na(data$tronc_diam) & !is.na(data$haut_tot) & !is.na(data$fk_stadedev) & !is.na(data$nomfrancais), ]
   
   model <- glm(remarquable ~ tronc_diam + haut_tot + fk_stadedev + nomfrancais, data = data_temp, family = "binomial")
-  print(summary(model))
   rows_to_predict <- data[is.na(data$remarquable), ]
   
   if (nrow(rows_to_predict) > 0) {
@@ -268,61 +294,16 @@ predict_remarquable <- function(data) {
 }
 
 
-lien_variable_quantitative <- function(data){
-  
-  ggplot(data,aes(x = haut_tot,y = age_estim))+
-    geom_point()+
-    geom_smooth(method ="lm", col="blue")+
-    labs(title = "Relation entre la hauteur totale et l'âge de l'arbre",
-         x = "Hauteur Totale",
-         y = "Âge de l'Arbre")
-  print(paste("Test de corrélation",cor(data$haut_tot,data$age_estim)))
-  
-  
-  ggplot(data,aes(x = tronc_diam,y = age_estim))+
-    geom_point()+
-    geom_smooth(method ="lm", col="blue")+
-    labs(title = "Relation entre le diamètre du tronc et l'âge de l'arbre",
-         x = "Diamètre du tronc",
-         y = "Âge de l'Arbre")
-  print(paste("Test de corrélation",cor(data$tronc_diam,data$age_estim)))
-  
-  ggplot(data,aes(x = haut_tot,y = tronc_diam))+
-    geom_point()+
-    geom_smooth(method ="lm", col="blue")+
-    labs(title = "Relation entre la hauteur totale et diamètre du tronc",
-         x = "Hauteur Totale",
-         y = "Diamètre du tronc")
-  print(paste("Test de corrélation",cor(data$haut_tot,data$tronc_diam)))
-}
 
-lien_variable_qualitative <- function(data){
-  
-  tab <- table(data$remarquable, data$fk_stadedev)
-  
-  chi2_test <- chisq.test(tab)
-  print(paste("Test chi2 entre remarquable et stade dev", chi2_test))
-  
-  mosaicplot(tab,main ="Mosaicplot entre remarquable et stade dev")
-  
-  tab2 <- table(data$remarquable, data$feuillage)
-  
-  chi2_test2 <- chisq.test(tab2)
-  print(paste("Test chi2 entre remarquable et feuillage", chi2_test2))
-  
-  mosaicplot(tab,main ="Mosaicplot entre remarquable et feuillage")
-}
 
-lien_variable_quan_qual<- function(data){
-  
-  ggplot(data,aes(x=feuillage,y=age_estim))+
-    geom_boxplot()+
-    labs(title ="Distribution entre l'âge et remarquable",
-         x = "Âge",
-         y = "Remarquable")
-  anova_test <- aov(age_estim ~ remarquable,data=data)
-  print(summary(anova_test))
-}
+
+
+
+
+
+
+
+
 
 
 
@@ -373,97 +354,3 @@ map <- map %>% addLegend(
 map
 # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
 }
-
-
-display_map_arbres_par_feuillage <- function (data){
-  # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
-  # Initialisation de la carte
-map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
-
-# valeurs uniques non NA, = nom des quartiers
-feuillages <- unique(na.omit(data$feuillage))
-# Définir un vecteur de couleurs
-colors <- colorRampPalette(c("red", "blue"))(length(feuillages))
-
-for(i in seq_along(feuillages)) {
-  feuil <- feuillages[i]
-  #print(quartier)
-
-  # Filtrer les données pour le quartier en cours
-  feuillage_data <- data %>% filter(feuillage == feuil)
-
-  #feuillage_data <- as.numeric(feuillage_data$feuillage)
-
-  map <- map %>% addCircles(data = feuillage_data,
-                            radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
-                            lat=feuillage_data$X,
-                            lng=feuillage_data$Y,
-                            color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
-                            group = feuil,
-                            popup = ~paste("Feuillage : ", feuillage_data$feuillage,"<br>Taille : ", feuillage_data$haut_tot, "<br>Quartier : ", feuillage_data$clc_quartier, "<br>Diam : ", feuillage_data$tronc_diam)) # infos en cliquant sur la pasatille
-}
-
-# Ajout de la légende à la carte
-map <- map %>% addLegend(
-  position = "bottomright",
-  colors = colors,
-  labels = feuillages,
-  title = "Feuillages"
-)
-map
-# ------ FIN AFFICHER ALL MAP PAR QUARTIERS
-}
-clc_zone_indus <- function (data){
-  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (A.Europe)")] <- tolower("Zone industrielle le Royeux")
-  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (G.Pompidou)")] <- tolower("Zone industrielle le Royeux")
-  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (G.Eiffel)")] <- tolower("Zone industrielle le Royeux")
-  data$clc_quartier[data$clc_secteur == tolower("Zone industrielle le Royeux (bassin)")] <- tolower("Zone industrielle le Royeux")
-  return(data)
-}
-
-
-
-
-
-
-
-
-
-# display_map_arbres_par_stade_dev <- function (data){
-#   # =========== DEBUT AFFICHAGE ALL MAP PAR QUARTIER
-#   # Initialisation de la carte
-# map <- leaflet(options = leafletOptions(preferCanvas = TRUE)) %>% addTiles()
-#
-# # valeurs uniques non NA, = nom des quartiers
-# stade_devs <- unique(na.omit(data$stade_dev))
-# # Définir un vecteur de couleurs
-# colors <- colorRampPalette(c("red", "blue", "green", "orange", "purple", "cyan"))(length(stade_devs))
-#
-# for(i in seq_along(stade_devs)) {
-#   sdv <- stade_devs[i]
-#   #print(quartier)
-#
-#   # Filtrer les données pour le quartier en cours
-#   stade_dev_data <- data %>% filter(stade_dev == sdv)
-#
-#   #feuillage_datatronc_diam <- as.numeric(feuillage_data$feuillage)
-#
-#   map <- map %>% addCircles(data = stade_dev_data,
-#                             radius = ~ifelse(is.na(tronc_diam), 1, tronc_diam/(2*pi)/20),# taille de la pastille en fonction du diametre
-#                             lat=stade_dev_data$X,
-#                             lng=stade_dev_data$Y,
-#                             color = ~ifelse(remarquable == "oui", "black", colors[i]), # les arbres remarquables en noir
-#                             group = feuil,
-#                             popup = ~paste("Feuillage : ", stade_dev_data$feuillage,"<br>Taille : ", stade_dev_data$haut_tot, "<br>Quartier : ", stade_dev_data$clc_quartier, "<br>Diam : ", stade_dev_data$tronc_diam)) # infos en cliquant sur la pasatille
-# }
-#
-# # Ajout de la légende à la carte
-# map <- map %>% addLegend(
-#   position = "bottomright",
-#   colors = colors,
-#   labels = stade_devs,
-#   title = "Stade de dev"
-# )
-# map
-# # ------ FIN AFFICHER ALL MAP PAR QUARTIERS
-# }
