@@ -3,6 +3,7 @@ library(httr)
 library(jsonlite)
 library(sf)
 library(tidyverse)
+library(dplyr)
 
 to_utf8 <- function(data) {
   for (identifier in colnames(data)) {
@@ -79,7 +80,7 @@ to_factor = function(data){ # transforme ces colonnes en facteurs pour simplifie
 }
 
 
-put_na_if_empty <- function(data){
+put_na_if_empty <- function(data){ # remplace les valeurs vides par des NAs
   for (col in colnames(data)) {
     data[[col]][data[[col]] == ""] <- NA
   }
@@ -87,13 +88,13 @@ put_na_if_empty <- function(data){
 }
 
 
-remove_empty_line13 <- function(data){
+remove_empty_line13 <- function(data){ # supprime la ligne si plus de 13 attributs sont manquants
   data = data[rowSums(is.na(data)) < 13, ]
   return(data)
   
 }
 
-remove_object_id <- function(data){
+remove_object_id <- function(data){ # unused
   data$OBJECTID = NULL
   return(data)
 }
